@@ -1,0 +1,20 @@
+# Secrets
+.env
+.env.*
+
+# Generated extraction output
+output/
+
+# Go binaries
+*.exe
+*.out
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Working assessment artifacts
+AGENTS.md
+TASK.md
