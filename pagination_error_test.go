@@ -21,7 +21,7 @@ func TestExtractUsersRejectsNextPageWithoutOffset(t *testing.T) {
 	client := NewClient("test-pat", server.Client())
 	client.BaseURL = server.URL
 
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(string, json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(string, json.RawMessage) error {
 		return nil
 	})
 	if err == nil {

@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-const workspaceGID = "1218492064871302"
-
 const pollIntervalEnv = "ASANA_POLL_INTERVAL"
 
 type Config struct {
@@ -23,6 +21,10 @@ func LoadConfig() (Config, error) {
 	if pat == "" {
 		return Config{}, fmt.Errorf("ASANA_PAT is required")
 	}
+	workspace := strings.TrimSpace(os.Getenv("ASANA_WORKSPACE_GID"))
+	if workspace == "" {
+		return Config{}, fmt.Errorf("ASANA_WORKSPACE_GID is required")
+	}
 
 	intervalValue := strings.TrimSpace(os.Getenv(pollIntervalEnv))
 	if intervalValue == "" {
@@ -35,7 +37,7 @@ func LoadConfig() (Config, error) {
 
 	return Config{
 		PAT:          pat,
-		WorkspaceGID: workspaceGID,
+		WorkspaceGID: workspace,
 		Interval:     interval,
 	}, nil
 }

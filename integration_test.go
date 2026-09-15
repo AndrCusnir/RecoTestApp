@@ -33,7 +33,7 @@ func TestRunExtractionCycleSavesUsersAndProjects(t *testing.T) {
 	}
 	client := NewClient("test-pat", server.Client())
 	client.BaseURL = server.URL
-	config := Config{PAT: "test-pat", WorkspaceGID: workspaceGID}
+	config := Config{PAT: "test-pat", WorkspaceGID: testWorkspaceGID}
 
 	if err := runExtractionCycle(context.Background(), config, client, storage, outputDir); err != nil {
 		t.Fatalf("runExtractionCycle() error = %v", err)
@@ -60,7 +60,7 @@ func TestRunExtractionCyclePropagatesStorageError(t *testing.T) {
 	storage := NewStorage(root)
 	client := NewClient("test-pat", server.Client())
 	client.BaseURL = server.URL
-	config := Config{PAT: "test-pat", WorkspaceGID: workspaceGID}
+	config := Config{PAT: "test-pat", WorkspaceGID: testWorkspaceGID}
 
 	err := runExtractionCycle(context.Background(), config, client, storage, root)
 	if err == nil {

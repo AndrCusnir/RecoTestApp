@@ -36,7 +36,7 @@ func TestExtractUsersRetriesAfter429AndDeliversEntity(t *testing.T) {
 	}
 
 	var gotGID string
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(gid string, entity json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(gid string, entity json.RawMessage) error {
 		gotGID = gid
 		return nil
 	})
@@ -71,7 +71,7 @@ func TestExtractUsersStopsAfterMaxRetries(t *testing.T) {
 	client.MaxRetries = 2
 	client.Sleep = func(context.Context, time.Duration) error { return nil }
 
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(string, json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(string, json.RawMessage) error {
 		return nil
 	})
 	if err == nil {
@@ -99,7 +99,7 @@ func TestExtractUsersDoesNotRetryNon429Errors(t *testing.T) {
 		return nil
 	}
 
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(string, json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(string, json.RawMessage) error {
 		return nil
 	})
 	if err == nil {
@@ -129,7 +129,7 @@ func TestExtractUsersPropagatesSleepCancellation(t *testing.T) {
 		return context.Canceled
 	}
 
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(string, json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(string, json.RawMessage) error {
 		return nil
 	})
 	if !errors.Is(err, context.Canceled) {
@@ -149,8 +149,8 @@ func TestExtractUsersRetryPreservesPaginationQuery(t *testing.T) {
 			return
 		}
 		if requestCount == 2 {
-			if got := r.URL.Query().Get("workspace"); got != workspaceGID {
-				t.Errorf("429 request workspace = %q, want %q", got, workspaceGID)
+			if got := r.URL.Query().Get("workspace"); got != testWorkspaceGID {
+				t.Errorf("429 request workspace = %q, want %q", got, testWorkspaceGID)
 			}
 			if got := r.URL.Query().Get("limit"); got != "100" {
 				t.Errorf("429 request limit = %q, want 100", got)
@@ -175,7 +175,7 @@ func TestExtractUsersRetryPreservesPaginationQuery(t *testing.T) {
 	client.Sleep = func(context.Context, time.Duration) error { return nil }
 
 	var gotGID string
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(gid string, entity json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(gid string, entity json.RawMessage) error {
 		gotGID = gid
 		return nil
 	})

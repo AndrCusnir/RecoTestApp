@@ -5,7 +5,7 @@ A small Go application for extracting users and projects from one Asana workspac
 ## Implemented Requirements
 
 - Personal Access Token authentication.
-- User and project extraction for one hardcoded workspace.
+- User and project extraction for one configured workspace.
 - Sequential pagination for users and projects.
 - Bounded HTTP 429 retries using `Retry-After`.
 - One JSON file per user and project.
@@ -28,8 +28,13 @@ The test suite uses local HTTP test servers and does not require live Asana acce
 2. Ensure the PAT user can access the workspace, users, and projects.
 3. Create a Personal Access Token in Asana.
 4. Keep the PAT outside the repository and provide it through the environment.
+5. Find the workspace GID by calling the Asana `/workspaces` endpoint with the PAT:
 
-The application targets workspace GID `1218492064871302`, defined in `config.go`. The workspace GID is not treated as a secret.
+  ```powershell
+  Invoke-RestMethod https://app.asana.com/api/1.0/workspaces -Headers @{ Authorization = "Bearer $env:ASANA_PAT" }
+  ```
+
+  Use the selected workspace object's `gid` as `ASANA_WORKSPACE_GID`.
 
 ## Configuration
 
@@ -37,6 +42,7 @@ Set the PAT in the environment:
 
 ```powershell
 $env:ASANA_PAT = "<personal-access-token>"
+$env:ASANA_WORKSPACE_GID = "<workspace-gid>"
 ```
 
 The application reads the polling mode from `ASANA_POLL_INTERVAL`. If it is unset, the default is `30s`.
@@ -88,7 +94,7 @@ Each file contains the original `json.RawMessage` entity received from the selec
 
 ## Architecture
 
-- `config.go`: reads `ASANA_PAT`, the hardcoded workspace GID, and polling mode.
+- `config.go`: reads `ASANA_PAT`, `ASANA_WORKSPACE_GID`, and polling mode.
 - `asana.go`: authenticated HTTP client, users/projects extraction, pagination, and 429 handling.
 - `storage.go`: output directory preparation and per-entity JSON files.
 - `polling.go`: supported interval parsing and sequential polling lifecycle.
@@ -125,7 +131,7 @@ Other HTTP errors, including 5xx responses, are returned without retrying. Proac
 
 ## Known Limitations and Production Improvements
 
-- The workspace GID is hardcoded for this assessment.
+- The workspace GID is required through `ASANA_WORKSPACE_GID`.
 - The list endpoints return the object shape selected by Asana, commonly compact objects; the application preserves that returned payload but does not make additional detail requests.
 - Files for entities removed from Asana are not deleted, so stale files may remain.
 - Only reactive 429 handling is implemented; there is no proactive rate limiter.

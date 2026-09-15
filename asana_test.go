@@ -10,6 +10,8 @@ import (
 	"testing"
 )
 
+const testWorkspaceGID = "test-workspace-gid"
+
 func TestLoadConfigRequiresAsanaPAT(t *testing.T) {
 	t.Setenv("ASANA_PAT", "")
 
@@ -36,8 +38,8 @@ func TestExtractUsersSinglePageAuthenticatesAndPreservesRawEntity(t *testing.T) 
 		if got := r.Header.Get("Authorization"); got != "Bearer "+token {
 			t.Errorf("Authorization header = %q, want %q", got, "Bearer "+token)
 		}
-		if got := r.URL.Query().Get("workspace"); got != workspaceGID {
-			t.Errorf("workspace query = %q, want %q", got, workspaceGID)
+		if got := r.URL.Query().Get("workspace"); got != testWorkspaceGID {
+			t.Errorf("workspace query = %q, want %q", got, testWorkspaceGID)
 		}
 		if got := r.URL.Query().Get("limit"); got != "100" {
 			t.Errorf("limit query = %q, want 100", got)
@@ -53,7 +55,7 @@ func TestExtractUsersSinglePageAuthenticatesAndPreservesRawEntity(t *testing.T) 
 
 	var gotGID string
 	var gotEntity json.RawMessage
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(gid string, entity json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(gid string, entity json.RawMessage) error {
 		gotGID = gid
 		gotEntity = entity
 		return nil
@@ -89,8 +91,8 @@ func TestExtractUsersPaginatesAndPreservesEveryRawEntity(t *testing.T) {
 		if r.URL.Path != "/users" {
 			t.Errorf("request path = %q, want /users", r.URL.Path)
 		}
-		if got := r.URL.Query().Get("workspace"); got != workspaceGID {
-			t.Errorf("workspace query = %q, want %q", got, workspaceGID)
+		if got := r.URL.Query().Get("workspace"); got != testWorkspaceGID {
+			t.Errorf("workspace query = %q, want %q", got, testWorkspaceGID)
 		}
 		if got := r.URL.Query().Get("limit"); got != "100" {
 			t.Errorf("limit query = %q, want 100", got)
@@ -118,7 +120,7 @@ func TestExtractUsersPaginatesAndPreservesEveryRawEntity(t *testing.T) {
 	client.BaseURL = server.URL
 
 	entities := make(map[string]json.RawMessage)
-	err := client.ExtractUsers(context.Background(), workspaceGID, func(gid string, entity json.RawMessage) error {
+	err := client.ExtractUsers(context.Background(), testWorkspaceGID, func(gid string, entity json.RawMessage) error {
 		if _, exists := entities[gid]; exists {
 			t.Errorf("consumer received duplicate GID %q", gid)
 		}
@@ -172,8 +174,8 @@ func TestExtractProjectsPaginatesAndPreservesEveryRawEntity(t *testing.T) {
 		if got := r.Header.Get("Authorization"); got != "Bearer "+token {
 			t.Errorf("Authorization header = %q, want %q", got, "Bearer "+token)
 		}
-		if got := r.URL.Query().Get("workspace"); got != workspaceGID {
-			t.Errorf("workspace query = %q, want %q", got, workspaceGID)
+		if got := r.URL.Query().Get("workspace"); got != testWorkspaceGID {
+			t.Errorf("workspace query = %q, want %q", got, testWorkspaceGID)
 		}
 		if got := r.URL.Query().Get("limit"); got != "100" {
 			t.Errorf("limit query = %q, want 100", got)
@@ -201,7 +203,7 @@ func TestExtractProjectsPaginatesAndPreservesEveryRawEntity(t *testing.T) {
 	client.BaseURL = server.URL
 
 	entities := make(map[string]json.RawMessage)
-	err := client.ExtractProjects(context.Background(), workspaceGID, func(gid string, entity json.RawMessage) error {
+	err := client.ExtractProjects(context.Background(), testWorkspaceGID, func(gid string, entity json.RawMessage) error {
 		if _, exists := entities[gid]; exists {
 			t.Errorf("consumer received duplicate GID %q", gid)
 		}
